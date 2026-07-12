@@ -8,7 +8,6 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ArmorStand;
-//~ if <1.21.11 'villager.Villager' -> 'Villager'
 import net.minecraft.world.entity.npc.villager.Villager;
 import org.polyfrost.hytils.client.HytilsRebornConfig;
 import org.polyfrost.oneconfig.api.hypixel.v1.HypixelUtils;

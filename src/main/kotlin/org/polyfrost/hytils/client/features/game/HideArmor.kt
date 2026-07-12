@@ -14,7 +14,6 @@ object HideArmor {
         val gameType = location.gameType.orElse(null) ?: return false
         val mode = location.mode.orElse(null) ?: return false
 
-        //~ if <1.21.11 '.identifier()' -> '.location()'
         val assetPath = equippable.assetId().get().identifier().path
 
         return if (assetPath.startsWith("leather")) {

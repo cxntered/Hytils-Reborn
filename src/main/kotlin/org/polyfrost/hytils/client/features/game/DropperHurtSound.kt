@@ -11,7 +11,6 @@ object DropperHurtSound {
         if (!HytilsRebornConfig.isEnabled || !HytilsRebornConfig.muteDropperHurtSound) return
 
         val location = HypixelUtils.getLocation()
-        //~ if <1.21.11 '.identifier' -> '.location'
         val path = event.sound.identifier.path
         if (HypixelUtils.isHypixel() && location.mode.orElse(null) == "DROPPER" && path == "entity.player.hurt") {
             event.cancelled = true

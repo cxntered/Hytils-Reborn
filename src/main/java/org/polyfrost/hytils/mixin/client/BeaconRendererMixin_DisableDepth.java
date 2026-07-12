@@ -1,14 +1,11 @@
 package org.polyfrost.hytils.mixin.client;
 
-//? if >=1.21.11 {
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-//?} else
-//import net.minecraft.client.renderer.RenderType;
-
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.renderer.blockentity.BeaconRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+//? if >=1.21.11
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
 import org.polyfrost.hytils.client.HytilsRebornConfig;
 import org.polyfrost.hytils.client.utils.RenderUtils;

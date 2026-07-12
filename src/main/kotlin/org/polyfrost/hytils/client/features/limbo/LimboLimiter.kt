@@ -1,6 +1,5 @@
 package org.polyfrost.hytils.client.features.limbo
 
-//~ if <1.21.11 'util.Util' -> 'Util'
 import net.minecraft.util.Util
 import org.polyfrost.oneconfig.api.event.v1.events.HypixelLocationEvent
 import org.polyfrost.oneconfig.api.event.v1.invoke.impl.Subscribe

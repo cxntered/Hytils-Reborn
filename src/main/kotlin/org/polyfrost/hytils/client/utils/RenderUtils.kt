@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.rendertype.RenderSetup
 import net.minecraft.client.renderer.rendertype.RenderTypes
 import org.polyfrost.hytils.mixin.client.accessor.RenderTypeAccessor
 //?} else
-//import net.minecraft.client.renderer.RenderType
+//import net.minecraft.client.renderer.rendertype.RenderType
 
 //? if >=1.21.10 {
 import net.minecraft.client.renderer.SubmitNodeCollector
@@ -32,7 +32,6 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 //~ if <26.1 'util.LightCoordsUtil' -> 'client.renderer.LightTexture as LightCoordsUtil'
 import net.minecraft.util.LightCoordsUtil
-//~ if <1.21.11 'util.Util' -> 'Util'
 import net.minecraft.util.Util
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f

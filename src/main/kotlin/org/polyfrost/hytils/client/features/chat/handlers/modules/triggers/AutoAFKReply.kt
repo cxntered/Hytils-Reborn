@@ -1,10 +1,6 @@
 package org.polyfrost.hytils.client.features.chat.handlers.modules.triggers
 
-//? if >=1.21.11 {
 import net.minecraft.util.Util
-//?} else
-//import net.minecraft.Util
-
 import org.polyfrost.hytils.client.HytilsRebornConfig
 import org.polyfrost.hytils.client.data.providers.LanguageData
 import org.polyfrost.hytils.client.events.ChatReceiveEvent
