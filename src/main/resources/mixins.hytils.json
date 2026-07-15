@@ -29,8 +29,6 @@
 		"client.events.SoundEngineMixin_SoundPlayEvent",
 		"client.heightoverlay.ModelBlockRendererMixin_HeightOverlay",
 		"client.hud.HudMixin_HardcoreHearts",
-		"client.hud.HudMixin_HideActionbar",
-		"client.hud.HudMixin_HideHudElements",
 		"client.hypixel.HypixelUtils_ReplaceHypixelCheck",
 		"client.hypixel.HypixelUtils_ReplaceInternals",
 		"client.hypixel.LocationMixin_FixLobbyStatus",

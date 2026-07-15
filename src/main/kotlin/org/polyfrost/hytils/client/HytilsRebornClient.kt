@@ -64,6 +64,8 @@ object HytilsRebornClient {
             // limbo features
             LimboLimiter, LimboPrivateMessageSounds,
         ).forEach { EventManager.INSTANCE.register(it) }
+        HideHudElements.init()
+        HideActionBar.init()
 
         ClientCommandRegistrationCallback.EVENT.register { dispatcher, _ ->
             listOf(
