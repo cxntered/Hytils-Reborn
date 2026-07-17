@@ -89,7 +89,7 @@ object HytilsRebornClient {
         }
 
         HudManager.register(
-            GameModeHud(), GameTypeHud(), MapNameHud()
+            GameModeHud(), GameTypeHud(), MapNameHud(), HeightLimitHud()
         )
 
         //~ if <26.1 'LevelRenderEvents' -> 'WorldRenderEvents'
