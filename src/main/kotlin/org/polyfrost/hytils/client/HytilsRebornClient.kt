@@ -25,7 +25,9 @@ import org.polyfrost.hytils.client.features.general.ArmorStandHider
 import org.polyfrost.hytils.client.features.limbo.LimboLimiter
 import org.polyfrost.hytils.client.features.limbo.LimboPrivateMessageSounds
 import org.polyfrost.hytils.client.features.lobby.SilentLobby
+import org.polyfrost.hytils.client.huds.*
 import org.polyfrost.oneconfig.api.event.v1.EventManager
+import org.polyfrost.oneconfig.api.hud.v1.HudManager
 import org.polyfrost.oneconfig.utils.v1.Multithreading
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -79,6 +81,10 @@ object HytilsRebornClient {
                 }
             }
         }
+
+        listOf(
+            GameModeHud(), GameTypeHud(), MapNameHud()
+        ).forEach { HudManager.register(it, HytilsRebornConfig.id) }
 
         //~ if <26.1 'LevelRenderEvents' -> 'WorldRenderEvents'
         //~ if <1.21.10 'END_MAIN' -> 'LAST'
