@@ -1,7 +1,7 @@
 package org.polyfrost.hytils.client.huds
 
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import net.minecraft.world.item.Item
+import org.polyfrost.compose.render.PolyColor
 import org.polyfrost.oneconfig.api.config.v1.annotations.MultiSelectDropdown
 import org.polyfrost.oneconfig.api.config.v1.annotations.RadioButton
 import org.polyfrost.oneconfig.api.config.v1.annotations.Slider
@@ -9,6 +9,8 @@ import org.polyfrost.oneconfig.api.config.v1.annotations.Switch
 import org.polyfrost.oneconfig.api.hud.v1.LegacyHud
 import org.polyfrost.oneconfig.utils.v1.dsl.mc
 import org.polyfrost.hytils.client.features.game.BedWarsResourcesTracker
+import org.polyfrost.oneconfig.api.config.v1.annotations.Color
+import org.polyfrost.oneconfig.api.config.v1.annotations.Text
 
 class BedWarsResourcesHud : LegacyHud(
     "bedwars_resources.json",
@@ -26,6 +28,24 @@ class BedWarsResourcesHud : LegacyHud(
     @Switch(title = "Show Ender Chest Resources")
     var showEnderChest = true
 
+    @Switch(title = "Expand Resource Counts")
+    var expandResourceCounts = false
+
+    @Text(title = "Add Symbol")
+    var addSymbol = " + "
+
+    @Text(title = "Equals Symbol")
+    var equalsSymbol = " = "
+
+    @Color(title = "Ender Chest Color")
+    var enderChestColor = PolyColor.PURPLE
+
+    @Color(title = "Total Color")
+    var totalColor = PolyColor.GREEN
+
+    @Color(title = "Symbol Color")
+    var symbolColor = PolyColor.rgb(85, 85, 85)
+
     @Switch(title = "Hide When Zero")
     var hideWhenZero = true
 
@@ -41,7 +61,7 @@ class BedWarsResourcesHud : LegacyHud(
     @RadioButton(title = "Text Position", options = ["Left", "Right"])
     var textPosition = 1
 
-    private val states = listOf(
+    private val states = arrayOf(
         ResourceState(BedWarsResourcesTracker.Resource.IRON),
         ResourceState(BedWarsResourcesTracker.Resource.GOLD),
         ResourceState(BedWarsResourcesTracker.Resource.DIAMOND),
@@ -57,6 +77,16 @@ class BedWarsResourcesHud : LegacyHud(
         get() = actualHeight
 
     override fun defaultPosition() = 0f to 0f
+
+    override fun setup() {
+        super.setup()
+
+        if (isReal) {
+            listOf(
+                "addSymbol", "equalsSymbol", "enderChestColor", "totalColor", "symbolColor"
+            ).forEach { hideIf(it, "expandResourceCounts") }
+        }
+    }
 
     override fun update(): Boolean {
         val textYOffset = ((ICON - mc.font.lineHeight) / 2f).toInt() + 1
@@ -78,15 +108,43 @@ class BedWarsResourcesHud : LegacyHud(
                 continue
             }
 
-            val count = getItemCount(state.resource.item)
-            state.isVisible = !hideWhenZero || count > 0
+            val item = state.resource.item
+            //~ if 1.21.4 '?.sumOf' -> '?.items?.sumOf'
+            val inventoryCount = mc.player?.inventory?.sumOf { if (it.item == item) it.count else 0 } ?: 0
+            val enderChestCount = if (showEnderChest) BedWarsResourcesTracker.enderChestCounts[item] ?: 0 else 0
+            val totalCount = inventoryCount + enderChestCount
 
+            state.isVisible = !hideWhenZero || totalCount > 0
             if (!state.isVisible) continue
 
-            if (state.count != count) {
-                state.count = count
-                state.text = count.toString()
-                state.textWidth = mc.font.width(state.text)
+            val shouldExpand = showEnderChest && expandResourceCounts && (!hideWhenZero || enderChestCount > 0)
+
+            if (state.inventoryCount != inventoryCount || state.enderChestCount != enderChestCount
+                || state.expanded != shouldExpand || state.lastAdd != addSymbol || state.lastEquals != equalsSymbol
+            ) {
+                
+                state.inventoryCount = inventoryCount
+                state.enderChestCount = enderChestCount
+                state.expanded = shouldExpand
+                state.lastAdd = addSymbol
+                state.lastEquals = equalsSymbol
+
+                if (shouldExpand) {
+                    state.inventoryText = inventoryCount.toString()
+                    state.enderChestText = enderChestCount.toString()
+                    state.totalText = totalCount.toString()
+                    
+                    state.inventoryWidth = mc.font.width(state.inventoryText)
+                    state.addWidth = mc.font.width(addSymbol)
+                    state.enderChestWidth = mc.font.width(state.enderChestText)
+                    state.equalsWidth = mc.font.width(equalsSymbol)
+                    val totalWidth = mc.font.width(state.totalText)
+
+                    state.textWidth = state.inventoryWidth + state.addWidth + state.enderChestWidth + state.equalsWidth + totalWidth
+                } else {
+                    state.singleText = totalCount.toString()
+                    state.textWidth = mc.font.width(state.singleText)
+                }
             }
 
             val textPart = if (state.textWidth > 0) TEXT_GAP + state.textWidth else 0
@@ -131,23 +189,50 @@ class BedWarsResourcesHud : LegacyHud(
             //~ if <26.1 'item' -> 'renderItem'
             mcCtx.item(state.resource.stack, state.iconX, state.iconY)
 
-            if (state.textWidth > 0) {
-                //~ if <26.1 'text' -> 'drawString'
-                mcCtx.text(mc.font, state.text, state.textX, state.textY, textColor)
+            if (state.textWidth <= 0) continue
+
+            //~ if <26.1 'mcCtx.text' -> 'mcCtx.drawString' {
+            if (state.expanded) {
+                var x = state.textX
+                    
+                mcCtx.text(mc.font, state.inventoryText, x, state.textY, textColor)
+                x += state.inventoryWidth
+
+                mcCtx.text(mc.font, state.lastAdd, x, state.textY, symbolColor.argb)
+                x += state.addWidth
+
+                mcCtx.text(mc.font, state.enderChestText, x, state.textY, enderChestColor.argb)
+                x += state.enderChestWidth
+
+                mcCtx.text(mc.font, state.lastEquals, x, state.textY, symbolColor.argb)
+                x += state.equalsWidth
+
+                mcCtx.text(mc.font, state.totalText, x, state.textY, totalColor.argb)
+            } else {
+                mcCtx.text(mc.font, state.singleText, state.textX, state.textY, textColor)
             }
+            //~}
         }
     }
 
-    private fun getItemCount(item: Item): Int {
-        val player = mc.player ?: return 0
-        val inventoryCount = player.inventory.sumOf { if (it.item == item) it.count else 0 }
-        val enderChestCount = if (showEnderChest) BedWarsResourcesTracker.enderChestCounts[item] ?: 0 else 0
-        return inventoryCount + enderChestCount
-    }
-
     private class ResourceState(val resource: BedWarsResourcesTracker.Resource) {
-        var count = -1
-        var text = ""
+        var inventoryCount = -1
+        var enderChestCount = -1
+
+        var expanded = false
+        var lastAdd = ""
+        var lastEquals = ""
+
+        var singleText = ""
+        var inventoryText = ""
+        var enderChestText = ""
+        var totalText = ""
+
+        var inventoryWidth = 0
+        var addWidth = 0
+        var enderChestWidth = 0
+        var equalsWidth = 0
+
         var textWidth = 0
         var iconX = 0
         var iconY = 0
