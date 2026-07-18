@@ -119,6 +119,7 @@ object LanguageData : DataProvider {
         "You found (?:an egg|a gift|a candy)! .\\d{1,3} total.",
         "\\W{0,3}\\w*\\S{0,3}\\s?\\w{1,16} has reached \\d{2,3} (?:gifts|eggs|candy)!"
     )
+    val DEPOSIT_ITEMS by regex("Deposited x(?<amount>\\d+) (?<item>\\w+(?: \\w+)*) into (?<chest>\\w+ Chest)! \\((?<total>\\d+) Total\\)")
     val SERVER_CONNECTED by regex(
         "You are currently connected to server \\S+",
         "Sending you to \\S+!",

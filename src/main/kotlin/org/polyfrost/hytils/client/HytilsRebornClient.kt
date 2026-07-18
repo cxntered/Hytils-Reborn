@@ -54,8 +54,8 @@ object HytilsRebornClient {
             ChatHandler, SilentLobby,
 
             // game features
-            BlockCountNotifier, CountdownTitles,
-            GameEndingTitles, GameStartingTitles,
+            BedWarsResourcesTracker, BlockCountNotifier,
+            CountdownTitles, GameEndingTitles, GameStartingTitles,
             ChestHighlighter, HardcoreStatus, HeightOverlay,
             MiniWallsMiddleBeacon, PitLagReducer,
             SumoRenderDistance, UHCMiddleWaypoint,
@@ -88,9 +88,9 @@ object HytilsRebornClient {
             }
         }
 
-        HudManager.register(
-            GameModeHud(), GameTypeHud(), MapNameHud(), HeightLimitHud()
-        )
+        listOf(
+            GameModeHud(), GameTypeHud(), MapNameHud(), HeightLimitHud(), BedWarsResourcesHud()
+        ).forEach { HudManager.register(it, HytilsRebornConfig.id) }
 
         //~ if <26.1 'LevelRenderEvents' -> 'WorldRenderEvents'
         //~ if <1.21.10 'END_MAIN' -> 'LAST'
