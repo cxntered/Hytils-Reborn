@@ -170,7 +170,8 @@ publishMods {
             val mcReleases = sc.properties.rawOrNull("mod:mc_releases")?.asList()?.map { it.toString() }
             minecraftVersions.addAll(mcReleases ?: listOf(mcVersion))
 
-            requires("oneconfig", "fabric-api", "fabric-language-kotlin", "hypixel-mod-api")
+            requires { slug = "oneconfig"; version = sc.properties.get<String>("deps.oneconfig") }
+            requires("fabric-api", "fabric-language-kotlin", "hypixel-mod-api")
         }
     }
 }
