@@ -1,16 +1,21 @@
 package org.polyfrost.hytils.client.huds
 
+import net.hypixel.data.type.GameType
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import org.polyfrost.compose.render.PolyColor
 import org.polyfrost.oneconfig.api.config.v1.annotations.MultiSelectDropdown
 import org.polyfrost.oneconfig.api.config.v1.annotations.RadioButton
 import org.polyfrost.oneconfig.api.config.v1.annotations.Slider
 import org.polyfrost.oneconfig.api.config.v1.annotations.Switch
+import org.polyfrost.oneconfig.api.hud.v1.HudManager
 import org.polyfrost.oneconfig.api.hud.v1.LegacyHud
 import org.polyfrost.oneconfig.utils.v1.dsl.mc
 import org.polyfrost.hytils.client.features.game.BedWarsResourcesTracker
+import org.polyfrost.hytils.client.features.game.BedWarsResourcesTracker.Resource
 import org.polyfrost.oneconfig.api.config.v1.annotations.Color
 import org.polyfrost.oneconfig.api.config.v1.annotations.Text
+import org.polyfrost.oneconfig.api.event.v1.eventHandler
+import org.polyfrost.oneconfig.api.event.v1.events.HypixelLocationEvent
 
 class BedWarsResourcesHud : LegacyHud(
     "bedwars_resources.json",
@@ -20,6 +25,13 @@ class BedWarsResourcesHud : LegacyHud(
     private companion object {
         private const val ICON = 16
         private const val TEXT_GAP = 2
+
+        private val EXAMPLE_COUNTS = mapOf(
+            Resource.IRON to (16 to 48),
+            Resource.GOLD to (8 to 4),
+            Resource.DIAMOND to (4 to 0),
+            Resource.EMERALD to (0 to 8),
+        )
     }
 
     @MultiSelectDropdown(title = "Shown Resources", options = ["Iron", "Gold", "Diamond", "Emerald"])
@@ -62,10 +74,10 @@ class BedWarsResourcesHud : LegacyHud(
     var textPosition = 1
 
     private val states = arrayOf(
-        ResourceState(BedWarsResourcesTracker.Resource.IRON),
-        ResourceState(BedWarsResourcesTracker.Resource.GOLD),
-        ResourceState(BedWarsResourcesTracker.Resource.DIAMOND),
-        ResourceState(BedWarsResourcesTracker.Resource.EMERALD)
+        ResourceState(Resource.IRON),
+        ResourceState(Resource.GOLD),
+        ResourceState(Resource.DIAMOND),
+        ResourceState(Resource.EMERALD)
     )
 
     private var actualWidth = ICON.toFloat()
@@ -80,6 +92,11 @@ class BedWarsResourcesHud : LegacyHud(
 
     override fun setup() {
         super.setup()
+
+        eventHandler { event: HypixelLocationEvent ->
+            hidden = event.location.gameType.orElse(null) != GameType.BEDWARS
+            updateAndRecalculate()
+        }
 
         if (isReal) {
             listOf(
@@ -109,9 +126,14 @@ class BedWarsResourcesHud : LegacyHud(
             }
 
             val item = state.resource.item
-            //~ if 1.21.4 '?.sumOf' -> '?.items?.sumOf'
-            val inventoryCount = mc.player?.inventory?.sumOf { if (it.item == item) it.count else 0 } ?: 0
-            val enderChestCount = if (showEnderChest) BedWarsResourcesTracker.enderChestCounts[item] ?: 0 else 0
+            val (inventoryCount, enderChestCount) = if (HudManager.isEditing) {
+                EXAMPLE_COUNTS[state.resource] ?: (0 to 0)
+            } else {
+                //~ if 1.21.4 '?.sumOf' -> '?.items?.sumOf'
+                val inventoryCount = mc.player?.inventory?.sumOf { if (it.item == item) it.count else 0 } ?: 0
+                val enderChestCount = if (showEnderChest) BedWarsResourcesTracker.enderChestCounts[item] ?: 0 else 0
+                inventoryCount to enderChestCount
+            }
             val totalCount = inventoryCount + enderChestCount
 
             state.isVisible = !hideWhenZero || totalCount > 0
@@ -215,7 +237,7 @@ class BedWarsResourcesHud : LegacyHud(
         }
     }
 
-    private class ResourceState(val resource: BedWarsResourcesTracker.Resource) {
+    private class ResourceState(val resource: Resource) {
         var inventoryCount = -1
         var enderChestCount = -1
 
