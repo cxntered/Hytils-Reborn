@@ -11,14 +11,8 @@ class HytilsRebornMixinPlugin : IMixinConfigPlugin {
             add("client.heightoverlay.BlockRendererMixin_HeightOverlay_Sodium")
         }
 
-        //? if >=1.21.11 {
+        //? if >=1.21.11
         add("client.accessor.RenderTypeAccessor")
-
-        add("client.chat.LineConsumerRendererMixin_RenderCustomLines")
-        add("client.chat.parameters.ClickableTextOnlyGraphicsAccessMixin")
-        add("client.chat.parameters.DrawingBackgroundGraphicsAccessMixin")
-        add("client.chat.parameters.DrawingFocusedGraphicsAccessMixin")
-        //?}
 
         //? if <1.21.8
         //add("client.hud.GuiMixin_HideHudElements")
